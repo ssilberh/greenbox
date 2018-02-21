@@ -1,3 +1,5 @@
+// Main application. Hanles API calls from user and from greenboxes.
+
 const express = require('express')
 const app = express()
 
