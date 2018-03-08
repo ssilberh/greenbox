@@ -1,18 +1,31 @@
-<html>
+<html lang="en">
+
+<head>
   <link rel="stylesheet" href="lib/bootstrap-3.3.7-dist/css/bootstrap.min.css"></link>
-  <script src="lib/angular.min.js"></script>
-  <script src="lib/angular-resource.min.js"></script>
-  <script src="lib/angular-route.min.js"></script>
+  <script src="lib/angular/angular.min.js"></script>
+  <script src="lib/angular/angular-resource.min.js"></script>
+  <script src="lib/angular/angular-route.min.js"></script>
+
+  <script src="components/greenbox.js"></script>
   <script src="index.js"></script>
 
-  <div ng-app="myApp" ng-controller="myCtrl">
-    Box:
-    First Name: <input type="text" ng-model="firstName"><br>
-    Last Name: <input type="text" ng-model="lastName"><br>
-    <br>
-    Full Name: {{firstName + " " + lastName}}<br/>
-    Greeting: {{greeting}}
+  <!-- help mobile sites view this page better -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <button type="button" class="btn btn-primary" ng-click="getBox()">Click me</button>
+</head>
+
+<body>
+  <div ng-app="myApp" ng-controller="myCtrl" class="container">
+
+    <div ng-repeat="box in boxes">
+      <greenbox></greenbox>
+
+      <br/>
+    </div>
+
+    <button type="button" class="btn btn-primary" ng-click="getUser()">Get User</button>
+
   </div>
+</body>
+
 </html>

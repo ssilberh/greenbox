@@ -1,0 +1,43 @@
+<div class="panel panel-default">
+
+  <div class="panel-heading">
+    <div class=input-group>
+      <span class="panel-title">Greenbox {{$index+1}} </span>
+      <button type="button" class="btn btn-primary" ng-show="!editingEnabled" ng-click="enableEditing(box)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+      <button type="button" class="btn btn-success" ng-show="editingEnabled" ng-click="doneEditing(box)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></span>
+
+    </div>
+
+    <!-- more correct header, keep if experimentation above does not pan out -->
+    <!-- <div class="row">
+      <div class="col-md-6"><div class="panel-title">Greenbox {{$index+1}}</div></div>
+      <div class="col-md-6">
+        <span class="glyphicon glyphicon-edit" aria-hidden="true" ng-show="!editingEnabled" ng-click="enableEditing(box)"></span>
+        <button type="button" class="btn btn-primary" ng-show="editingEnabled" ng-click="doneEditing(box)">Save</span>
+      </div>
+    </div> -->
+
+  </div>
+  <div class="panel-body">
+    <h4>Box id:</h4>
+    {{box.boxId}}
+
+    <br/><br/>
+
+    <form class="form-inline">
+      <h4>Plant type:</h4> <span ng-show="!editingEnabled">{{box.type}}</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.type" />
+    </form>
+
+    <br/>
+
+    <form class="form-inline">
+      <h4>Temperature profile:</h4>
+      Yearly high temperature: <span ng-show="!editingEnabled">{{box.maxYearly}} (°F)</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.maxYearly" /><br/>
+      Yearly low temperature: <span ng-show="!editingEnabled">{{box.minYearly}} (°F)</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.minYearly" /><br/>
+      Daily temperature variance: <span ng-show="!editingEnabled">{{box.dailyDiff}} (°F)</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.dailyDiff" /><br/>
+    </form>
+
+    <br/><br/>
+
+  </div>
+</div>
