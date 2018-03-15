@@ -4960,7 +4960,7 @@ a.badge:focus {
   padding-bottom: 30px;
   margin-bottom: 30px;
   color: white;
-  height: 350px;
+  height:100%;
   background:transparent;
 }
 .jumbotron h1,
