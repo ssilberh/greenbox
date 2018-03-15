@@ -7,6 +7,11 @@
   <script src="lib/angular/angular-route.min.js"></script>
 
   <script src="components/greenbox.js"></script>
+
+  <script src="lib/jquery/jquery-3.3.1.min.js"></script>
+  <script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+  <script src="lib/chartjs/chart.bundle.js"></script>
+  <script src="lib/chartjs/chartjs-directive.js"></script>
   <script src="index.js"></script>
 
   <!-- help mobile sites view this page better -->
@@ -15,15 +20,29 @@
 </head>
 
 <body>
-  <div ng-app="myApp" ng-controller="myCtrl" class="container">
+  <!-- Display navbar upon login -->
+  <nav class="navbar navbar-inverse">
+    <ul class="nav navbar-nav navbar-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-cog" aria-hidden="true"></span><span class="caret"></span></a>
+        <ul class="dropdown-menu">
+          <li><a href="#">Account Preferences</a></li>
+          <li><a href="#">About Us</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#">Logout</a></li>
+        </ul>
+      </li>
+    </ul>
+    <a class="navbar-brand" href="#">Greenbox</a>
 
+  </nav>
+
+  <!-- Display all of this user's boxes -->
+  <div ng-app="myApp" ng-controller="myCtrl" class="container">
     <div ng-repeat="box in boxes">
       <greenbox></greenbox>
-
       <br/>
     </div>
-
-    <button type="button" class="btn btn-primary" ng-click="getUser()">Get User</button>
 
   </div>
 </body>
