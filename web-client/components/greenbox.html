@@ -25,7 +25,16 @@
     <br/><br/>
 
     <form class="form-inline">
-      <h4>Plant type:</h4> <span ng-show="!editingEnabled">{{box.type}}</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.type" />
+      <h4>Plant type:</h4>
+      <!-- <span ng-show="!editingEnabled">{{box.type}}</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.type" /> -->
+      <ui-select ng-model="selectedBoxType" theme="selectize" ng-disabled="ctrl.disabled" style="width: 300px;" title="Choose a box type">
+        <ui-select-match placeholder="Choose a box type...">{{selectedBoxType}}</ui-select-match>
+        <ui-select-choices repeat="box in populatedBoxList | filter: $select.search">
+          <span ng-bind-html="box.name | highlight: $select.search"></span>
+        </ui-select-choices>
+      </ui-select>
+      <!-- <h1 ng-repeat="x in populatedBoxList">{{x.name}} max:{{x.maxYearly}}</h1> -->
+
     </form>
 
     <br/>
@@ -38,7 +47,21 @@
     </form>
 
     <br/><br/>
-    <chart value="temperatureGraphOneYear"></chart>
+
+    <div role="tabpanel" class="tab-pane active container-fluid" id="home">
+             <div class="row">
+                 <div class="col-md-6"><div class="panel panel-default">
+                 <div class="panel-body">
+                   <canvas id="{{box.boxId+'Id'}}" style='width:10px;height=10px'></canvas>
+                 </div>
+             </div></div>
+                 <div class="col-md-6"><div class="panel panel-default">
+                 <div class="panel-body">
+                   <canvas id="{{box.boxId+'DayId'}}"></canvas>
+                 </div>
+             </div></div>
+             </div>
+    </div>
 
   </div>
 </div>

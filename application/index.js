@@ -12,9 +12,15 @@ const app = express();
 
 // seed users with an already-existing box
 var users = {123: {"boxes":[
-  {boxId:"b0001", type:"lemonTree", maxYearly:70, minYearly:46, dailyDiff:10},
-  {boxId:"b0002", type:"orchid", maxYearly:88, minYearly:76, dailyDiff:5}
+  {boxId:"b0001", type:"Lemon Tree"},
+  {boxId:"b0002", type:"Orchid" }
 ],"gender":"male"}}; // userId: list of boxes (boxId, type)
+
+// define a few boxes for the user
+var predefinedBoxes = [
+  {name:"Lemon Tree", maxYearly:70, minYearly:46, dailyDiff:10 },
+  {name:"Orchid", maxYearly:88, minYearly:76, dailyDiff:5 }
+];
 
 var staticName = path.join(__dirname, "/../web-client/");
 app.use(express.static(staticName));
@@ -55,6 +61,12 @@ app.get('/greenbox/:boxId', function (req, res) {
   console.log('Attempting to get box with id '+id);
 
   res.send();
+})
+
+app.get('/boxes/predefined', function(req, res) {
+  console.log('Attempting to get all predefined boxes');
+
+  res.send(predefinedBoxes);
 })
 
 // create a user

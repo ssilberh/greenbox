@@ -1,8 +1,9 @@
 angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
-.controller('myCtrl', function($scope, $http, $resource) {
+.controller('myCtrl', function($scope, $http, $resource, $timeout) {
 
   var greenboxResource = $resource('http://localhost:3000/greenbox/:boxId', {boxId:'@id'});
   var userResource = $resource('http://localhost:3000/user/:userId', {userId:'@id'});
+  var greenboxOptions = $resource('http://localhost:3000/boxes/predefined');
 
   $scope.userId = 123;
   $scope.boxes = [];
@@ -23,6 +24,14 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
       });
   }
 
-  $scope.getUser();
+  $scope.getGreenboxOptions = function() {
+      greenboxOptions.query(function(response) {
+        if(response) {
+          $scope.populatedBoxList = response;
+        }
+      })
+  }
 
+  $scope.getUser();
+  $scope.getGreenboxOptions();
 });

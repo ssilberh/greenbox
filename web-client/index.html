@@ -2,6 +2,7 @@
 
 <head>
   <link rel="stylesheet" href="lib/bootstrap-3.3.7-dist/css/bootstrap.min.css"></link>
+  <link rel="stylesheet" href="lib/ui-select/select.min.css"></link>
   <script src="lib/angular/angular.min.js"></script>
   <script src="lib/angular/angular-resource.min.js"></script>
   <script src="lib/angular/angular-route.min.js"></script>
@@ -10,8 +11,10 @@
 
   <script src="lib/jquery/jquery-3.3.1.min.js"></script>
   <script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+  <script src="lib/ui-select/angular-sanitize.js"></script>
+  <script src="lib/ui-select/select.min.js"></script>
   <script src="lib/chartjs/chart.bundle.js"></script>
-  <script src="lib/chartjs/chartjs-directive.js"></script>
+
   <script src="index.js"></script>
 
   <!-- help mobile sites view this page better -->
@@ -39,6 +42,7 @@
 
   <!-- Display all of this user's boxes -->
   <div ng-app="myApp" ng-controller="myCtrl" class="container">
+
     <div ng-repeat="box in boxes">
       <greenbox></greenbox>
       <br/>
