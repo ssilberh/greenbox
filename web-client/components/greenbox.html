@@ -27,8 +27,11 @@
     <form class="form-inline">
       <h4>Plant type:</h4>
       <!-- <span ng-show="!editingEnabled">{{box.type}}</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.type" /> -->
-      <ui-select ng-model="selectedBoxType" theme="selectize" ng-disabled="ctrl.disabled" style="width: 300px;" title="Choose a box type">
-        <ui-select-match placeholder="Choose a box type...">{{selectedBoxType}}</ui-select-match>
+
+      <p>Selected: {{selectedBoxType}}</p>
+
+      <ui-select ng-model="selectedBoxType" theme="selectize" style="width: 300px;" title="Choose a box type">
+        <ui-select-match placeholder="Choose a box type...">{{$select.selected.name}}</ui-select-match>
         <ui-select-choices repeat="box in populatedBoxList | filter: $select.search">
           <span ng-bind-html="box.name | highlight: $select.search"></span>
         </ui-select-choices>

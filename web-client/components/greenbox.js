@@ -7,7 +7,6 @@ angular.module('greenboxModule', ['ngSanitize', 'ui.select'])
     scope: true,
     templateUrl: 'components/greenbox.html',
     controller: ['$scope', function(scope, timeout) {
-      scope.selectedBoxType;
 
       // Calculate what the temperature graph looks like over a given time period
       var chartData = function(startDay, endDay) {
@@ -169,6 +168,8 @@ angular.module('greenboxModule', ['ngSanitize', 'ui.select'])
       });
 
       scope.editingEnabled = false;
+      
+      scope.selectedBoxType = "";
 
       scope.enableEditing = function(box) {
         scope.editingEnabled = true;
