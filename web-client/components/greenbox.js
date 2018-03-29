@@ -168,20 +168,72 @@ angular.module('greenboxModule', ['ngSanitize', 'ui.select'])
       });
 
       scope.editingEnabled = false;
-      
-      scope.selectedBoxType = "";
+      scope.userDefiningValues = false;
 
-      scope.enableEditing = function(box) {
+      scope.enableEditing = function() {
         scope.editingEnabled = true;
       }
 
-      scope.doneEditing = function(box) {
+      scope.doneEditing = function() {
+
+        // clean up state when we are done editing
         scope.editingEnabled = false;
-        scope.updateBox(box);
+        scope.box.name = scope.selectedBoxType.selected.name;
+
+        // if we created a new box type, push the new type to the server
+        scope.updateGreenboxOptions(scope.selectedBoxType.selected)
+
+        // then, update the box to tie it to the new type
+        scope.updateBox(scope.box);
 
         // update graphs after we update parameters
         renderGraphs();
       }
+
+      var boxDetails;
+      for(var predefinedBoxIdx = 0; predefinedBoxIdx < scope.populatedBoxList.length; predefinedBoxIdx++) {
+        if(scope.populatedBoxList[predefinedBoxIdx].name == scope.box.name) {
+          boxDetails = scope.populatedBoxList[predefinedBoxIdx];
+          break;
+        }
+      }
+      scope.selectedBoxType = {};
+      scope.selectedBoxType.selected = boxDetails;
+
+      scope.boxColor = ["Terrestrial", "Aquatic"];
+
+      // scope.selectedBox.selected = scope.box;
+      scope.$watch('selectedBoxType.selected', function() {
+
+        if(scope.selectedBoxType && scope.selectedBoxType.selected) {
+
+          // If we are defining our own box values, allow textboxes to define this
+          // to show up.
+          if(scope.selectedBoxType.selected.name == "Other") {
+            scope.userDefiningValues = true;
+          }
+          else {
+            scope.userDefiningValues = false;
+
+            var entry;
+            for(var i = 0; i < scope.populatedBoxList.length; i++) {
+              if(scope.populatedBoxList[i].name == scope.selectedBoxType.selected.name) {
+                entry = scope.populatedBoxList[i];
+                break;
+              }
+            }
+
+            if(entry) {
+              scope.box.maxYearly = entry.maxYearly;
+              scope.box.minYearly = entry.minYearly;
+              scope.box.dailyDiff = entry.dailyDiff;
+            }
+            else{
+              console.log('DIDNT FIND '+ scope.selectedBoxType.selected.name+' in '+JSON.stringify(scope.populatedBoxList))
+            }
+          }
+        }
+      });
 
     }]
   }

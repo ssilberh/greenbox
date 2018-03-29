@@ -3,7 +3,7 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
 
   var greenboxResource = $resource('http://localhost:3000/greenbox/:boxId', {boxId:'@id'});
   var userResource = $resource('http://localhost:3000/user/:userId', {userId:'@id'});
-  var greenboxOptions = $resource('http://localhost:3000/boxes/predefined');
+  var greenboxOptions = $resource('http://localhost:3000/boxes/types/:userId', {userId:'@id'});
 
   $scope.userId = 123;
   $scope.boxes = [];
@@ -19,17 +19,26 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
   }
 
   $scope.updateBox = function(box) {
+    console.log('saving:'+JSON.stringify(box))
       greenboxResource.save({boxId:$scope.userId}, JSON.stringify(box), function(response) {
 
       });
   }
 
   $scope.getGreenboxOptions = function() {
-      greenboxOptions.query(function(response) {
+      greenboxOptions.query({userId:$scope.userId}, function(response) {
         if(response) {
+          console.log('got back populated box list of: '+JSON.stringify(response))
           $scope.populatedBoxList = response;
+          // $scope.populatedBoxList.push({'name':'Other'})
         }
       })
+  }
+
+  $scope.updateGreenboxOptions = function(type) {
+    greenboxOptions.save({userId:$scope.userId}, JSON.stringify(type), function(response) {
+
+    });
   }
 
   $scope.getUser();

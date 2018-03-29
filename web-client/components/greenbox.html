@@ -3,8 +3,8 @@
   <div class="panel-heading">
     <div class=input-group>
       <span class="panel-title">Greenbox {{$index+1}} </span>
-      <button type="button" class="btn btn-primary" ng-show="!editingEnabled" ng-click="enableEditing(box)"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
-      <button type="button" class="btn btn-success" ng-show="editingEnabled" ng-click="doneEditing(box)"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></span>
+      <button type="button" class="btn btn-primary" ng-show="!editingEnabled" ng-click="enableEditing()"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></button>
+      <button type="button" class="btn btn-success" ng-show="editingEnabled" ng-click="doneEditing()"><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span></span>
 
     </div>
 
@@ -21,19 +21,23 @@
   <div class="panel-body">
     <h4>Box id:</h4>
     {{box.boxId}}
-
     <br/><br/>
 
     <form class="form-inline">
-      <h4>Plant type:</h4>
-      <!-- <span ng-show="!editingEnabled">{{box.type}}</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.type" /> -->
+      <h4>Plant name:</h4>
+      <span ng-show="!userDefiningValues">{{selectedBoxType.selected.name}}</span>
+      <input type="text" ng-show="editingEnabled && selectedBoxType.userDefined" class="form-control mb-2 mr-sm-2" ng-model="selectedBoxType.selected.name" />
+      <br/><br/>
 
-      <p>Selected: {{selectedBoxType}}</p>
+      <h4>Box type:</h4>
+      <span>{{selectedBoxType.selected.type}}<span></br></br>
 
-      <ui-select ng-model="selectedBoxType" theme="selectize" style="width: 300px;" title="Choose a box type">
-        <ui-select-match placeholder="Choose a box type...">{{$select.selected.name}}</ui-select-match>
-        <ui-select-choices repeat="box in populatedBoxList | filter: $select.search">
-          <span ng-bind-html="box.name | highlight: $select.search"></span>
+      <!-- <input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.type" /></br> -->
+
+      <ui-select ng-model="selectedBoxType.selected" theme="selectize" style="width: 300px;" title="Choose a box type" ng-show="editingEnabled">
+        <ui-select-match allow-clear="true" placeholder="Choose a box type...">{{$select.selected.name}}</ui-select-match>
+        <ui-select-choices repeat="boxType in populatedBoxList | filter: $select.search">
+          <span ng-bind-html="boxType.name | highlight: $select.search"></span>
         </ui-select-choices>
       </ui-select>
       <!-- <h1 ng-repeat="x in populatedBoxList">{{x.name}} max:{{x.maxYearly}}</h1> -->
@@ -44,9 +48,9 @@
 
     <form class="form-inline">
       <h4>Temperature profile:</h4>
-      Yearly high temperature: <span ng-show="!editingEnabled">{{box.maxYearly}} (°F)</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.maxYearly" /><br/>
-      Yearly low temperature: <span ng-show="!editingEnabled">{{box.minYearly}} (°F)</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.minYearly" /><br/>
-      Daily temperature variance: <span ng-show="!editingEnabled">{{box.dailyDiff}} (°F)</span><input type="text" ng-show="editingEnabled" class="form-control mb-2 mr-sm-2" ng-model="box.dailyDiff" /><br/>
+      Yearly high temperature: <span ng-show='!userDefiningValues'>{{selectedBoxType.selected.maxYearly}} (°F)</span><input type="text" ng-show="editingEnabled && userDefiningValues" class="form-control mb-2 mr-sm-2" ng-model="selectedBoxType.selected.maxYearly" /><br/>
+      Yearly low temperature: <span ng-show='!userDefiningValues'>{{selectedBoxType.selected.minYearly}} (°F)</span><input type="text" ng-show="editingEnabled && userDefiningValues" class="form-control mb-2 mr-sm-2" ng-model="selectedBoxType.selected.minYearly" /><br/>
+      Daily temperature variance: <span ng-show='!userDefiningValues'>{{selectedBoxType.selected.dailyDiff}} (°F)</span><input type="text" ng-show="editingEnabled && userDefiningValues" class="form-control mb-2 mr-sm-2" ng-model="selectedBoxType.selected.dailyDiff" /><br/>
     </form>
 
     <br/><br/>
