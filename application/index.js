@@ -146,5 +146,9 @@ app.get('/user/:userId', function (req, res) {
   res.send(ret);
 })
 
+app.get('/', function(req, res) {
+  res.sendStatus(200)
+})
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
+var greenboxServer = app.listen(3000)
+module.exports = greenboxServer;
