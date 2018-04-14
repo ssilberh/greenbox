@@ -3,7 +3,7 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
 
   var greenboxResource = $resource('http://localhost:3000/greenbox/:boxId', {boxId:'@id'});
   var userResource = $resource('http://localhost:3000/user/:userId', {userId:'@id'});
-  var greenboxOptions = $resource('http://localhost:3000/boxes/types/:userId', {userId:'@id'});
+  var greenboxOptions = $resource('http://localhost:3000/plantType/:userId', {userId:'@id'});
 
   $scope.userId = 123;
   $scope.boxes = [];
