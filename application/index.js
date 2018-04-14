@@ -68,7 +68,7 @@ console.log('trying to find '+box.name)
     console.log('havent found '+box.name+' so adding now')
 
     // if we've gotten here, the box isn't present so create the new type
-    var newType = {name:box.name, maxYearly:box.maxYearly, minYearly:box.minYearly, dailyDiff:box.dailyDiff, type:box.type}
+    var newType = {name:box.name, maxYearly:box.maxYearly, minYearly:box.minYearly, dailyDiff:box.dailyDiff, type:box.type, userDefined:true}
     users[userId].userDefinedBoxes.push(newType);
   }
 }
@@ -113,27 +113,40 @@ app.get('/greenbox/:boxId', function (req, res) {
   res.send();
 })
 
-// get boxes the user can choose from (or they can create a new box)
-app.get('/boxes/types/:userId', function(req, res) {
-  console.log('Attempting to get all predefined boxes');
+// get plant types the user can choose from (or they can create a new plant type)
+app.get('/plantType/:userId', function(req, res) {
   var id = req.params.userId;
+
+  console.log('Attempting to get all predefined boxes for user: '+id);
 
   if(id && users[id]) {
     // send all predefined boxes plus whatever boxes the user has defined
-    res.send(predefinedBoxes.concat(users[id].userDefinedBoxes));
+    res.status(200).send(predefinedBoxes.concat(users[id].userDefinedBoxes));
+  }
+  else {
+    res.sendStatus(500);
   }
 })
 
-app.post('/boxes/types/:userId', function(req, res) {
+app.post('/plantType/:userId', function(req, res) {
   console.log('Attempting to add a new user predefined box');
   var id = req.params.userId;
 
   addOrUpdateBoxType(id, req.body);
+
+  res.sendStatus(200);
 })
 
 // create a user
-app.post('/user', function (req, res) {
-  res.send('User created or updated ' + req.body.id)
+app.post('/user/:userId', function (req, res) {
+  console.log('Attempting to create a new user')
+  var id = req.params.userId;
+
+  if(!users[id]) {
+    users[id] = { 'userDefinedBoxes':[] };
+  }
+
+  res.send('User created or updated ' + id)
 })
 
 // get a user
@@ -142,7 +155,6 @@ app.get('/user/:userId', function (req, res) {
   console.log('Attempting to load user id ' + id);
 
   var ret = users[id];
-  console.log('Found '+ret);
   res.send(ret);
 })
 
