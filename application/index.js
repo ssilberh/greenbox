@@ -16,23 +16,71 @@ const boxTypeEnum = Object.freeze(["Terrestrial", "Aquatic"])
 // seed users with an already-existing box
 // also, define a box that only this user can see - they created this (but populate
 // it with fake data for now)
-var users = { 123:
-{
-  "boxes":[
-    {boxId:"b0001", name:"Lemon Tree"},
-    {boxId:"b0002", name:"Orchid" }
-  ],
-  "gender":"male",
-  "userDefinedBoxes":[
-    {name:"Steven's Cool Plant", maxYearly:55, minYearly:36, dailyDiff:6, type:boxTypeEnum[1], userDefined:true }
-  ]
-}};
+var users = [
+  {
+    "id":123,
+    "boxes":['b0001', 'b0002'],
+    "gender":"male",
+    "userDefinedBoxTypes":[
+      {name:
+        "Steven's Cool Plant",
+        maxYearly:55,
+        minYearly:36,
+        dailyDiff:6,
+        type:boxTypeEnum[1],
+        userDefined:true
+      }
+    ]
+  }];
+
+// list of boxes; dereference by unique boxId field
+// TODO: back by DB, unique key on boxId
+var boxes = [
+  { boxId:"b0001", type:"Lemon Tree", modules:['m-p0001'] }, { boxId:"b0002", name:"Orchid" }
+];
+
+// list of modules; users dereference by id
+// TODO: back by DB, unique key on id
+var modules = [
+    {id:"m-p0001", type:"peltierType1", health:"good", lastHeardFrom:(new Date())}
+  ];
+
+// list of types of modules. Holds parameters specific to a given type of module.
+// Name must be unique.
+var moduleTypes = [
+    {name:"peltierType1", purpose:"Temperature Control", maxCommandedTemp:80, minCommandedTemp:40}
+  ];
 
 // define a few boxes for the user that come by default
-var predefinedBoxes = [
+var predefinedBoxTypes = [
   {name:"Lemon Tree", maxYearly:70, minYearly:46, dailyDiff:10, type:boxTypeEnum[0], userDefined:false },
   {name:"Orchid", maxYearly:88, minYearly:76, dailyDiff:5, type:boxTypeEnum[0], userDefined:false }
 ];
+
+// given a unique identifier, dereference a given list. Eventually, this will
+// be backed by a database.
+var lookup = function(id, idName, collection) {
+  for(var i = 0; i < collection.length; i++) {
+    if(collection[i][idName] == id) {
+      return collection[i];
+    }
+  }
+  return null;
+}
+
+// update an element in an array/a document in a database depending on backing structure
+var addOrUpdate = function(id, idName, collection, newValue) {
+  for(var i = 0; i < collection.length; i++) {
+    if(collection[i][idName] == id) {
+      collection[i] = newValue;
+    }
+  }
+  collection.push(newValue);
+}
+
+var generateRandomId = function() {
+  return Math.floor(Math.random()*10000000000);
+}
 
 var staticName = path.join(__dirname, "/../web-client/");
 app.use(express.static(staticName));
@@ -42,122 +90,228 @@ app.use(parser.json())
 
 app.get('/', (req, res) => res.send('Hello World!'))
 
-// Find if the type of the inputted box is already present in the predefinedBoxes
-// or userDefinedBoxes. If it isn't, create a new type in the userDefinedBoxes.
-var addOrUpdateBoxType = function(userId, box) {
-console.log('trying to find '+box.name)
-  // check if the box is in the predefined boxes list
-  for(var i = 0; i < predefinedBoxes.length; i++) {
-    if(predefinedBoxes[i].name == box.name) {
-      console.log('found '+box.name+' in predefined')
+// Find if the type of the inputted box is already present in the predefinedBoxTypes
+// or userDefinedBoxTypes. If it isn't, create a new type in the userDefinedBoxTypes.
+// Returns true if this method created a new plant type, false otherwise.
+var addOrUpdatePlantType = function(userId, box) {
+  var user = lookup(userId, 'id', users);
 
-      return;
+  // enforce rule that max must be more than min yearly temperature
+  if(box.minYearly > box.maxYearly) {
+    return false;
+  }
+
+  // check if the box is in the predefined boxes list
+  for(var i = 0; i < predefinedBoxTypes.length; i++) {
+    if(predefinedBoxTypes[i].name == box.name) {
+      return false;
     }
   }
 
   // TODO: if this doesn't exist, create it
-  if(userId && users[userId] && users[userId].userDefinedBoxes) {
+  if(userId && user && user.userDefinedBoxTypes) {
     // check if the box is in the user defined boxes list
-    for(var i = 0; i < users[userId].userDefinedBoxes.length; i++) {
-      if(users[userId].userDefinedBoxes[i].name == box.name) {
-        console.log('found '+box.name+' in user defined boxes')
+    for(var i = 0; i < user.userDefinedBoxTypes.length; i++) {
 
-        return;
+      // we found a box type with the same name, so update the box
+      if(user.userDefinedBoxTypes[i].name == box.name) {
+        var prev = user.userDefinedBoxTypes[i];
+        prev.maxYearly = box.maxYearly;
+        prev.minYearly = box.minYearly;
+        prev.dailyDiff = box.dailyDiff;
+        prev.type = box.type;
+        return true;
       }
     }
-    console.log('havent found '+box.name+' so adding now')
 
     // if we've gotten here, the box isn't present so create the new type
     var newType = {name:box.name, maxYearly:box.maxYearly, minYearly:box.minYearly, dailyDiff:box.dailyDiff, type:box.type, userDefined:true}
-    users[userId].userDefinedBoxes.push(newType);
+    user.userDefinedBoxTypes.push(newType);
+    return true;
   }
 }
 
-// create or update a greenbox
-app.post('/greenbox/:userId', function (req, res) {
+// create or update a box associated with a user
+app.post('/users/:userId/boxes', function (req, res) {
   var userId = req.params.userId;
+  var boxId = req.body.boxId;
+  var boxType = req.body.type;
+  var user = lookup(userId, 'id', users);
 
-  if(users[userId]) {
+  // box we will be returning to the user - either new or updated box
+  var ret;
 
-    var usersBoxes = users[userId].boxes;
-    if(usersBoxes) {
-      console.log('trying to update '+JSON.stringify(req.body))
+  // if we are creating a box (no id is passed), assign a new unique box id
+  if(!boxId) {
+    boxId = 'b'+generateRandomId();
+  }
+  else if(!user || !user.boxes || user.boxes.indexOf(boxId) == -1) {
+    // if we have a requested boxId, make sure that the requested boxId exists
+    // for the user
+    res.sendStatus(400);
+    return;
+  }
 
-      var found = false;
-      // find the box being updated
-      for(var i = 0; i < usersBoxes.length; i++) {
-        if(usersBoxes[i].boxId == req.body.boxId){
-          found = true;
+  if(user && boxId && boxType) {
+    // lookup the posted box type in the user-defined box types and predefined box types.
+    // We expect that this box type already exists, and if it does not, the
+    // request was invalid.
+    var userDefinedType = lookup(boxType, 'name', user.userDefinedBoxTypes);
+    var predefinedType = lookup(boxType, 'name', predefinedBoxTypes);
 
-          usersBoxes[i].name = req.body.name;
-          addOrUpdateBoxType(userId, req.body);
-
-          break;
-        }
+    if(userDefinedType || predefinedType) {
+      // if the user does not have a box array, create an empty one
+      var usersBoxes = user.boxes;
+      if(!usersBoxes) {
+        user.boxes = [];
       }
 
-      if(!found) {
-        // TODO: create new box
+      // Copy values out of body of request, update boxes with newest box.
+      // Then, associate this box with the requested user.
+      var box = {'boxId': boxId, 'boxType': boxType};
+      ret = box;
+      addOrUpdate(boxId, 'boxId', boxes, box);
+
+      // link box to a user if the user does not already have a reference to this box id
+      if(user.boxes.indexOf(boxId) == -1) {
+        user.boxes.push(boxId);
       }
     }
   }
 
-  res.send('Greenbox created or updated for userId:' + userId)
-})
-
-// get a greenbox
-app.get('/greenbox/:boxId', function (req, res) {
-  var id = req.params.boxId;
-  console.log('Attempting to get box with id '+id);
-
-  res.send();
-})
-
-// get plant types the user can choose from (or they can create a new plant type)
-app.get('/plantType/:userId', function(req, res) {
-  var id = req.params.userId;
-
-  console.log('Attempting to get all predefined boxes for user: '+id);
-
-  if(id && users[id]) {
-    // send all predefined boxes plus whatever boxes the user has defined
-    res.status(200).send(predefinedBoxes.concat(users[id].userDefinedBoxes));
+  if(ret) {
+    res.status(200).send(ret);
   }
   else {
-    res.sendStatus(500);
+    res.sendStatus(400);
   }
-})
+});
 
-app.post('/plantType/:userId', function(req, res) {
-  console.log('Attempting to add a new user predefined box');
+// send all boxes for a given user
+app.get('/users/:userId/boxes', function(req, res) {
+  var userId = req.params.userId;
+  var user = lookup(userId, 'id', users);
+
+  if(user) {
+    res.status(200).send(user.boxes);
+  }
+  else {
+    res.sendStatus(400);
+  }
+});
+
+// return the requested box for the requested user
+app.get('/users/:userId/boxes/:boxId', function(req, res) {
+  var userId = req.params.userId;
+  var boxId = req.params.boxId;
+  var user = lookup(userId, "id", users);
+  var box = lookup(boxId, "boxId", boxes);
+
+  // check that this box belongs to the requested user, return box.
+  // Otherwise, return 400.
+  if(user && box) {
+    res.status(200).send(box);
+  }
+  else {
+    res.sendStatus(400);
+  }
+});
+
+// get a greenbox
+app.get('/greenboxes/:boxId', function (req, res) {
+  var id = req.params.boxId;
+  res.send();
+});
+
+// create plant type
+app.post('/users/:userId/plantTypes', function(req, res) {
   var id = req.params.userId;
 
-  addOrUpdateBoxType(id, req.body);
+  var createdOrUpdated = addOrUpdatePlantType(id, req.body);
+  if(createdOrUpdated) {
+    res.sendStatus(200);
+  } else {
+    // the given plant type is pre-defined and cannot be updated
+    res.sendStatus(400);
+  }
+});
 
-  res.sendStatus(200);
-})
+// get plant types the user can choose from
+app.get('/users/:userId/plantTypes', function(req, res) {
+  var id = req.params.userId;
+  var user = lookup(id, 'id', users);
+
+  if(id && user) {
+    // send all predefined boxes plus whatever boxes the user has defined
+    res.status(200).send(predefinedBoxTypes.concat(user.userDefinedBoxTypes));
+  }
+  else {
+    res.sendStatus(400);
+  }
+});
 
 // create a user
-app.post('/user/:userId', function (req, res) {
-  console.log('Attempting to create a new user')
+app.post('/users/:userId', function (req, res) {
   var id = req.params.userId;
+  var user = lookup(id, 'id', users);
 
-  if(!users[id]) {
-    users[id] = { 'userDefinedBoxes':[] };
+  if(id && !user) {
+    addOrUpdate(id, 'id', users, { 'id':id, 'userDefinedBoxTypes':[] });
+    res.status(200).send(user);
+  }
+  else{
+    res.sendStatus(400);
   }
 
-  res.send('User created or updated ' + id)
 })
 
 // get a user
-app.get('/user/:userId', function (req, res) {
+app.get('/users/:userId', function (req, res) {
   var id = req.params.userId;
-  console.log('Attempting to load user id ' + id);
+  var user = lookup(id, 'id', users);
 
-  var ret = users[id];
-  res.send(ret);
+  if(id && user) {
+    res.status(200).send(user);
+  }
+  else {
+    res.sendStatus(400);
+  }
 })
 
+// get a module type (like heating module, etc). ModuleTypes cannot be created
+// by the client and must be defined by the application
+app.get('/moduleTypes', function(req, res) {
+  res.status(200).send(moduleTypes);
+});
+
+// create a module. Module is assigned an identifying guid on creation.
+app.post('/users/:userId/boxes/:boxId/modules', function(req, res) {
+  var toAdd = req.body;
+
+  if(!toAdd.type) {
+    res.sendStatus(400);
+  } else {
+    // TODO: generate real guid
+    var newModule = {type:toAdd.type, id:generateRandomId()}
+
+    // TODO: persist this into db
+    modules.push(newModule);
+
+    res.send(newModule);
+  }
+
+});
+
+// get a module
+app.get('/users/:userId/boxes/:boxId/modules/:moduleId', function(req, res) {
+  var id = req.params.moduleId;
+
+  var ret = lookup(id, "id", modules);
+
+  res.status(200).send(ret);
+});
+
+// test connection to site
 app.get('/', function(req, res) {
   res.sendStatus(200)
 })
