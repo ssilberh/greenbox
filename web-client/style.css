@@ -1,5 +1,5 @@
 .jumbotronbg {
-  background: url('/assets/carrot.jpg') no-repeat center center;
+  background: url('./assets/carrot.jpg') no-repeat center center;
   position: fixed;
   width: 100%;
   height: 100%;
