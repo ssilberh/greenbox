@@ -11,6 +11,6 @@ To run application:
 
 To run tests:
 1. cd application/
-2. npm test
+2. npm test 
 
 
