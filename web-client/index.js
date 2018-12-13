@@ -1,6 +1,7 @@
 angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
 .controller('myCtrl', function($scope, $http, $resource, $timeout) {
 
+  var mqttConnectionString = 'mqtt://localhost:4000';
   var greenboxResource = $resource('http://localhost:3000/greenbox/:boxId', {boxId:'@id'});
   var userResource = $resource('http://localhost:3000/user/:userId', {userId:'@id'});
   var greenboxOptions = $resource('http://localhost:3000/plantType/:userId', {userId:'@id'});
@@ -41,6 +42,25 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
     });
   }
 
-  $scope.getUser();
-  $scope.getGreenboxOptions();
+  // Get initial state of screen. For now, comment out
+  // $scope.getUser();
+  // $scope.getGreenboxOptions();
+
+  // Connect client to MQTT messaging so we don't need to poll application for new info
+  // docs at https://github.com/mqttjs/MQTT.js
+  client.on("connect", function(ack) {
+    console.log("MQTT connected!");
+
+  });
+
+  client.on("message", function(topic, payload) {
+    alert([topic, payload].join(": "));
+    client.end();
+  });
+
+  // TODO: update options with name of real clientId
+  var client = mqtt.connect(mqttConnectionString, { clientId: "stevenAndKatherine" });
+
+  client.subscribe("mqtt/demo");
+
 });
