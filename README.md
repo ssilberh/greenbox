@@ -10,7 +10,7 @@ To run application:
 
 To run tests:
 1. cd application/
-2. npm test
+2. npm test 
 
 Current hardware list:
 1. ESP8266 WIFI shield RB-Mkf-14 from RobotShop ($9.80)
