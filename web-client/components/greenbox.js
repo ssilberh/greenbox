@@ -191,6 +191,7 @@ angular.module('greenboxModule', ['ngSanitize', 'ui.select'])
       }
 
       var boxDetails;
+
       for(var predefinedBoxIdx = 0; predefinedBoxIdx < scope.populatedBoxList.length; predefinedBoxIdx++) {
         if(scope.populatedBoxList[predefinedBoxIdx].name == scope.box.name) {
           boxDetails = scope.populatedBoxList[predefinedBoxIdx];

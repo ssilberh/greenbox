@@ -36,7 +36,7 @@ var users = [
 // list of boxes; dereference by unique boxId field
 // TODO: back by DB, unique key on boxId
 var boxes = [
-  { boxId:"b0001", type:"Lemon Tree", modules:['m-p0001'] }, { boxId:"b0002", name:"Orchid" }
+  { boxId:"b0001", name:"Lemon Tree", modules:['m-p0001'] }, { boxId:"b0002", name:"Orchid" }
 ];
 
 // list of modules; users dereference by id
