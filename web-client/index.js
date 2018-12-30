@@ -1,7 +1,7 @@
 angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
 .controller('myCtrl', function($scope, $http, $resource, $timeout) {
 
-  var mqttConnectionString = 'mqtt://localhost:4000';
+  var mqttConnectionString = 'mqtt://192.168.1.56:1883';
   var greenboxResource = $resource('http://localhost:3000/users/:userId/boxes/:boxId', {userId:'@id', boxId:'@box'});
   var userResource = $resource('http://localhost:3000/users/:userId', {userId:'@id'});
   var greenboxOptions = $resource('http://localhost:3000/users/:userId/plantTypes', {userId:'@id'});
@@ -69,7 +69,7 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
   var client = mqtt.connect(mqttConnectionString, { clientId: "stevenAndKatherine" });
 
   client.on("connect", function(ack) {
-    console.log("MQTT connected!");
+    console.log("MQTT connected to "+mqttConnectionString);
   });
 
   client.on("message", function(topic, payload) {
@@ -77,6 +77,6 @@ angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
     client.end();
   });
 
-  client.subscribe("mqtt/demo");
+  client.subscribe("outTopic");
 
 });

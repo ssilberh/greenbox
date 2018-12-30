@@ -1,5 +1,3 @@
-// var mosca = require('mosca');
-
 var ascoltatore = {
   //using ascoltatore
   type: 'mongo',
@@ -9,10 +7,17 @@ var ascoltatore = {
 };
 
 var settings = {
-  backend: ascoltatore
+  backend: ascoltatore,
+  host: '0.0.0.0',
+  port: 8080,
+  http: {
+    port: 1883,
+    host: '0.0.0.0',
+    static: './mqtt/',
+    bundle: true,
+  },
+  allowNonSecure: true
 };
-
-// var server = new mosca.Server(settings);
 
 var http     = require('http')
   , httpServ = http.createServer()
@@ -21,16 +26,30 @@ var http     = require('http')
 
 server.attachHttpServer(httpServ);
 
-httpServ.listen(4000);
+// httpServ.listen(8080, '192.168.1.56');
 
 server.on('clientConnected', function(client) {
   console.log('client connected!!!!')
     console.log('client connected', client.id);
 });
 
+server.on('clientDisconnected', function(client) {
+  console.log('client disconnected!!!!')
+    console.log('client disconnected', client.id);
+});
+
 // fired when a message is received
 server.on('published', function(packet, client) {
-  console.log('Published', packet.payload);
+  if(packet.payload[0] != '{') {
+    try{
+      var jsonPayload = JSON.parse('\"'+packet.payload+'\"');
+      console.log('payload: '+JSON.stringify(jsonPayload) + ' to topic: '+packet.topic)
+    }catch(ex){}
+  }
+  else{
+    console.log('payload: '+JSON.stringify(packet.payload) + ' to topic: '+ packet.topic)
+  }
+
 });
 
 server.on('ready', setup);
@@ -39,3 +58,9 @@ server.on('ready', setup);
 function setup() {
   console.log('Mosca server is up and running');
 }
+
+process.on('uncaughtException', function (err) {
+  console.log('found uncaught exception')
+    console.error(err.stack);
+    console.log("Node NOT Exiting...");
+});
