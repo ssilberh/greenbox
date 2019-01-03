@@ -83,6 +83,14 @@ var generateRandomId = function() {
 }
 
 var staticName = path.join(__dirname, "/../web-client/");
+
+// enable cors so we can hit site from outsite localhost
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use(express.static(staticName));
 
 app.use(parser.urlencoded({ extended: false }))
@@ -132,7 +140,7 @@ var addOrUpdatePlantType = function(userId, box) {
 }
 
 // create or update a box associated with a user
-app.post('/users/:userId/boxes', function (req, res) {
+app.post('/users/:userId/boxes', function (req, res, next) {
   var userId = req.params.userId;
   var boxId = req.body.boxId;
   var boxType = req.body.type;
@@ -185,10 +193,12 @@ app.post('/users/:userId/boxes', function (req, res) {
   else {
     res.sendStatus(400);
   }
+
+  next();
 });
 
 // send all boxes for a given user
-app.get('/users/:userId/boxes', function(req, res) {
+app.get('/users/:userId/boxes', function(req, res, next) {
   var userId = req.params.userId;
   var user = lookup(userId, 'id', users);
 
@@ -198,10 +208,12 @@ app.get('/users/:userId/boxes', function(req, res) {
   else {
     res.sendStatus(400);
   }
+
+  next();
 });
 
 // return the requested box for the requested user
-app.get('/users/:userId/boxes/:boxId', function(req, res) {
+app.get('/users/:userId/boxes/:boxId', function(req, res, next) {
   var userId = req.params.userId;
   var boxId = req.params.boxId;
   var user = lookup(userId, "id", users);
@@ -215,16 +227,20 @@ app.get('/users/:userId/boxes/:boxId', function(req, res) {
   else {
     res.sendStatus(400);
   }
+
+  next();
 });
 
 // get a greenbox
-app.get('/greenboxes/:boxId', function (req, res) {
+app.get('/greenboxes/:boxId', function (req, res, next) {
   var id = req.params.boxId;
   res.send();
+
+  next();
 });
 
 // create plant type
-app.post('/users/:userId/plantTypes', function(req, res) {
+app.post('/users/:userId/plantTypes', function(req, res, next) {
   var id = req.params.userId;
 
   var createdOrUpdated = addOrUpdatePlantType(id, req.body);
@@ -234,10 +250,12 @@ app.post('/users/:userId/plantTypes', function(req, res) {
     // the given plant type is pre-defined and cannot be updated
     res.sendStatus(400);
   }
+
+  next();
 });
 
 // get plant types the user can choose from
-app.get('/users/:userId/plantTypes', function(req, res) {
+app.get('/users/:userId/plantTypes', function(req, res, next) {
   var id = req.params.userId;
   var user = lookup(id, 'id', users);
 
@@ -248,10 +266,12 @@ app.get('/users/:userId/plantTypes', function(req, res) {
   else {
     res.sendStatus(400);
   }
+
+  next();
 });
 
 // create a user
-app.post('/users/:userId', function (req, res) {
+app.post('/users/:userId', function (req, res, next) {
   var id = req.params.userId;
   var user = lookup(id, 'id', users);
 
@@ -263,10 +283,11 @@ app.post('/users/:userId', function (req, res) {
     res.sendStatus(400);
   }
 
+  next();
 })
 
 // get a user
-app.get('/users/:userId', function (req, res) {
+app.get('/users/:userId', function (req, res, next) {
   var id = req.params.userId;
   var user = lookup(id, 'id', users);
 
@@ -276,16 +297,20 @@ app.get('/users/:userId', function (req, res) {
   else {
     res.sendStatus(400);
   }
+
+  next();
 })
 
 // get a module type (like heating module, etc). ModuleTypes cannot be created
 // by the client and must be defined by the application
-app.get('/moduleTypes', function(req, res) {
+app.get('/moduleTypes', function(req, res, next) {
   res.status(200).send(moduleTypes);
+
+  next();
 });
 
 // create a module. Module is assigned an identifying guid on creation.
-app.post('/users/:userId/boxes/:boxId/modules', function(req, res) {
+app.post('/users/:userId/boxes/:boxId/modules', function(req, res, next) {
   var toAdd = req.body;
 
   if(!toAdd.type) {
@@ -300,20 +325,24 @@ app.post('/users/:userId/boxes/:boxId/modules', function(req, res) {
     res.send(newModule);
   }
 
+  next();
 });
 
 // get a module
-app.get('/users/:userId/boxes/:boxId/modules/:moduleId', function(req, res) {
+app.get('/users/:userId/boxes/:boxId/modules/:moduleId', function(req, res, next) {
   var id = req.params.moduleId;
 
   var ret = lookup(id, "id", modules);
 
   res.status(200).send(ret);
+
+  next();
 });
 
 // test connection to site
-app.get('/', function(req, res) {
-  res.sendStatus(200)
+app.get('/', function(req, res, next) {
+  res.sendStatus(200);
+  next();
 })
 
 var greenboxServer = app.listen(3000)

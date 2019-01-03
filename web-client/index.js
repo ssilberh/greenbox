@@ -1,10 +1,15 @@
 angular.module('myApp', ['ngRoute','ngResource','greenboxModule'])
 .controller('myCtrl', function($scope, $http, $resource, $timeout) {
 
-  var mqttConnectionString = 'mqtt://192.168.1.56:1883';
-  var greenboxResource = $resource('http://localhost:3000/users/:userId/boxes/:boxId', {userId:'@id', boxId:'@box'});
-  var userResource = $resource('http://localhost:3000/users/:userId', {userId:'@id'});
-  var greenboxOptions = $resource('http://localhost:3000/users/:userId/plantTypes', {userId:'@id'});
+  // TODO: put consts in globally accessable file
+  var ip = '192.168.1.56'; // ip where app is running. TODO: change once app is registered w DNS
+  var appPort = 3000; // port main app runs on
+  var mqttPort = 1833; // port mqtt broker runs on
+
+  var mqttConnectionString = 'mqtt://'+ip+':'+mqttPort;
+  var greenboxResource = $resource('http://'+ip+':'+appPort+'/users/:userId/boxes/:boxId', {userId:'@id', boxId:'@box'});
+  var userResource = $resource('http://'+ip+':'+appPort+'/users/:userId', {userId:'@id'});
+  var greenboxOptions = $resource('http://'+ip+':'+appPort+'/users/:userId/plantTypes', {userId:'@id'});
 
   $scope.userId = 123;
   $scope.boxes = [];
