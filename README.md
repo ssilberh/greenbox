@@ -13,7 +13,7 @@ Reference - https://docs.microsoft.com/en-us/azure/virtual-machines/windows/inst
 3. Install IDE (probably at least Visual Studio and Android Studio)
 
 To run application:
-1. "node index.js" to run the main application on localhost:3000
+1. "node app.js" to run the main application on localhost:3000
 2. "mongod" to start MongoDB on the default URI mongodb://localhost:27017
 3. "node mqttBroker.js" to start the MQTT broker. This runs on mqtt://localhost:4000. Note: mongo must be running before the MQTT broker can be run.
 
