@@ -14,10 +14,14 @@ const UsersSchema = new Schema({
 
 UsersSchema.methods.setPassword = function(password) {
   this.salt = crypto.randomBytes(16).toString('hex');
+  // TODO: investigate async pbkdf2 for performance. Also, do we salt enough?
+  // https://nodejs.org/en/docs/guides/simple-profiling/
   this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
 };
 
 UsersSchema.methods.validatePassword = function(password) {
+  // TODO: investigate async pbkdf2 for performance. Also, do we salt enough?
+  // https://nodejs.org/en/docs/guides/simple-profiling/
   const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
   return this.hash === hash;
 };

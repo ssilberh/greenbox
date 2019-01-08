@@ -6,6 +6,13 @@ var fs = require('fs');
 var serveStatic = require('serve-static');
 
 const bodyParser = require('body-parser');
+
+// According to https://www.npmjs.com/package/express-session:
+// Warning The default server-side session storage, MemoryStore, is purposely
+// not designed for a production environment. It will leak memory under most
+// conditions, does not scale past a single process, and is meant for debugging
+// and developing.
+// TODO: use connect-mongo? (https://www.npmjs.com/package/connect-mongo)
 const session = require('express-session');
 const express = require('express');
 const parser = require('body-parser');
@@ -15,6 +22,8 @@ const mongoose = require('mongoose');
 mongoose.promise = global.Promise;
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+// TODO: configure and change secret
 app.use(session({ secret: 'passport-tutorial', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false }));
 
 mongoose.connect('mongodb://localhost:27017/greenbox', { useNewUrlParser: true });
@@ -115,8 +124,6 @@ app.use(express.static(staticName));
 
 app.use(parser.urlencoded({ extended: false }))
 app.use(parser.json())
-
-// app.get('/', (req, res) => res.send('Hello World!'))
 
 // Find if the type of the inputted box is already present in the predefinedBoxTypes
 // or userDefinedBoxTypes. If it isn't, create a new type in the userDefinedBoxTypes.
